@@ -1,0 +1,1 @@
+bun build ./app.ts --outdir ./build
