@@ -1,4 +1,4 @@
-export async function post_response(task:string, answer:unknown){
+export async function post_response<T = any>(task:string, answer:unknown){
     try {
 
         const response = await fetch("https://centrala.ag3nts.org/report", {
@@ -12,10 +12,10 @@ export async function post_response(task:string, answer:unknown){
                 "answer": answer
             })
         });
-        
+
         console.log('Response success ', response.status == 200);
 
-        let responseData = await response.json();
+        let responseData = await response.json() as T;
 
         console.log("response text:", responseData);
 

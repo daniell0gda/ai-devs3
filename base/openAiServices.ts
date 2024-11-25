@@ -2,6 +2,7 @@ import OpenAI,{ toFile } from "openai";
 import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 import dotenv from 'dotenv'
 import type {CreateEmbeddingResponse} from 'openai/resources';
+import {get_img_text} from '../S02E04/prompts.ts';
 
 export class OpenAIService {
   private openai: OpenAI;
@@ -43,27 +44,48 @@ export class OpenAIService {
     }
   }
 
-  async analyzeImage(imageBase64:string) {
-    // Example of using a public image URL
-    const publicImageUrl = "https://example.com/image.jpg";
-    
-    // Prepare messages for the API call
-    const messages = [
-        { role: 'user', content: 'What do you see in this image?' },
-        { role: 'user', content: publicImageUrl }, // For public URL
-        { role: 'user', content: `data:image/jpeg;base64,${imageBase64}` } // For local image
-    ] as any;
+  async askAboutImage(system:string,imageBase64:string, userText:string) : Promise<string>{
 
-    try {
-        const response = await this.openai.chat.completions.create({
-            model: 'gpt-4-vision',
-            messages,
-        });
-        console.log(response.choices[0].message.content);
-    } catch (error) {
-        console.error('Error analyzing image:', error);
+    let imgPart = {
+      "type": "image_url",
+      "image_url": {
+        "url": `data:image/jpeg;base64,${imageBase64}`,
+        "detail": "high"
+      }
+    };
+    const userPrompt: ChatCompletionMessageParam = {
+      role: "user",
+      content: userText ? [imgPart,
+        {
+          type: 'text',
+          text: 'userText'
+        }
+      ] : [imgPart] as any[]
+    };
+
+    const systemPrompt: ChatCompletionMessageParam = {
+      role: "system",
+      content: system
+    };
+
+    const allMessages: ChatCompletionMessageParam[] = [
+      systemPrompt,
+      userPrompt
+    ];
+    const answer = (await this.completion(allMessages, "gpt-4o", false, false)) as OpenAI.Chat.Completions.ChatCompletion;
+
+    // console.log(answer)
+
+    if (answer.choices[0] && answer.choices[0].message.content) {
+      // answer.choices[0].message
+
+      let content = answer.choices[0].message.content;
+      console.log(content);
+      return content;
     }
-}
+
+    throw new Error('Failed to get answer from AI');
+  }
 
   async completion(
     messages: ChatCompletionMessageParam[],
