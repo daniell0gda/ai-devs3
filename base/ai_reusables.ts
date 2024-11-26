@@ -34,7 +34,8 @@ export async function make_ai_response(
   user:string | OpenAI.Chat.Completions.ChatCompletionContentPartText[], 
   system:string | OpenAI.Chat.Completions.ChatCompletionContentPartText[],
   temp?: number,
-  jsonMode?:boolean
+  jsonMode?:boolean,
+  model= "gpt-4o-mini"
   ) : Promise<string>{
 
   const userPrompt: ChatCompletionMessageParam = {
@@ -53,7 +54,7 @@ export async function make_ai_response(
     ];
   const answer = (await openaiService.completion(
     allMessages,
-    "gpt-4o-mini",
+    model,
     false,
     jsonMode,
     temp

@@ -1,5 +1,10 @@
-const axios = require('axios');
+import fs from 'fs';
 
+const axios = require('axios');
+export interface MyFile {
+    content:string;
+    name:string;
+}
 
 export async function fetchPageContent(url:string, mode: 'json'|'text'):Promise<string> {
     try {
@@ -54,4 +59,43 @@ export async function getImageAsBase64(url:string) {
         console.error('Error fetching the image:', error);
         throw new Error(`Failed to download image: ${url}`, )
     }
+}
+
+export async function read_files(path:string, ext = '.txt'): Promise<MyFile[]> {
+    const directoryPath = path;
+
+    // Convert fs.readdir to Promise-based operation
+    const files = await new Promise<string[]>((resolve,
+      reject) => {
+        fs.readdir(
+          directoryPath,
+          (err,
+            files) => {
+              if (err) {
+                  reject(err);
+                  return;
+              }
+              resolve(files);
+          }
+        );
+    });
+
+    let allTODO: MyFile[] = [];
+    for (const file of files) {
+
+        if (!file.endsWith('.txt')) {
+            continue;
+        }
+
+        let fullPath = `${directoryPath}/${file}`;
+
+        let text = fs.readFileSync(fullPath)
+          .toString();
+        allTODO.push({
+            name: file,
+            content: text
+        });
+    }
+
+    return allTODO;
 }

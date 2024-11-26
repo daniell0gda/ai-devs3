@@ -19,6 +19,18 @@ export class OpenAIService {
     });
   }
 
+  async train(fileName:string){
+    let result = await this.openai.fineTuning.jobs.create({
+      model: 'gpt-4o-mini-2024-07-18',
+      training_file: fileName
+    })
+    if(result.error){
+      throw new Error(result.error.message)
+    }
+
+    console.log('finished at', result.finished_at);
+  }
+
   async transcribeAudio(audioBuffer: Buffer): Promise<string> {
     try {
       console.log('Transcribing audio, buffer length:', audioBuffer.length);
