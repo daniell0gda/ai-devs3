@@ -60,15 +60,15 @@ export async function make_ai_response(
     temp
   )) as OpenAI.Chat.Completions.ChatCompletion;
   
-  // console.log(answer)
+  // console.log(JSON.stringify(answer.choices[0].message))
 
-  if (answer.choices[0] && answer.choices[0].message.content) {       
+  if (answer.choices[0] && answer.choices[0].message) {
       // answer.choices[0].message
 
       let content = answer.choices[0].message.content;
       
       console.log('AI Response:', content);
-      return content;
+      return content || '';
   } 
 
   throw new Error('Failed to get answer from AI');

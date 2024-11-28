@@ -6,7 +6,7 @@ export interface MyFile {
     name:string;
 }
 
-export async function fetchPageContent(url:string, mode: 'json'|'text'):Promise<string> {
+export async function fetchPageContent<ResponseType = string>(url:string, mode: 'json'|'text'):Promise<ResponseType> {
     try {
         console.log('Fetching page content', url);
 
@@ -16,18 +16,16 @@ export async function fetchPageContent(url:string, mode: 'json'|'text'):Promise<
         }
         if(mode == 'text'){
             const html = await response.text();
-            console.log('Page content', html);
-            return html; // Returns the HTML content as a string
+            return html as ResponseType; // Returns the HTML content as a string
         }
 
         const json = await response.json();
-        console.log('Page content', json);
         return json; // Returns the HTML content as a string
         
     } catch (error) {
         console.error('There has been a problem with your fetch operation:', error);
 
-        return '';
+        return '' as ResponseType;
     }
 }
 
