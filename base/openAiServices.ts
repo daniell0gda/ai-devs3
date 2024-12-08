@@ -56,7 +56,7 @@ export class OpenAIService {
     }
   }
 
-  async askAboutImage(system:string,imageBase64:string, userText:string) : Promise<string>{
+  async askAboutImage(system:string,imageBase64:string, userText:string, model="gpt-4o") : Promise<string>{
 
     let imgPart = {
       "type": "image_url",
@@ -84,7 +84,7 @@ export class OpenAIService {
       systemPrompt,
       userPrompt
     ];
-    const answer = (await this.completion(allMessages, "gpt-4o", false, false)) as OpenAI.Chat.Completions.ChatCompletion;
+    const answer = (await this.completion(allMessages, model, false, false)) as OpenAI.Chat.Completions.ChatCompletion;
 
     // console.log(answer)
 

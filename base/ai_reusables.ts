@@ -67,7 +67,7 @@ export async function make_ai_response(
 
       let content = answer.choices[0].message.content;
       
-      console.log('AI Response:', content);
+      console.log(content);
       return content || '';
   } 
 

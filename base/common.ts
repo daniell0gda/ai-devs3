@@ -4,6 +4,7 @@ const axios = require('axios');
 export interface MyFile {
     content:string;
     name:string;
+    fullPath:string;
 }
 
 export async function fetchPageContent<ResponseType = string>(url:string, mode: 'json'|'text'):Promise<ResponseType> {
@@ -30,7 +31,7 @@ export async function fetchPageContent<ResponseType = string>(url:string, mode: 
 }
 
 
-export async function downloadMP3(url:string) {
+export async function downloadFileGetBuffer(url:string) {
     try {
         // Make a GET request to the URL with responseType set to 'arraybuffer'
         const response = await axios.get(url, { responseType: 'arraybuffer' });
@@ -38,11 +39,25 @@ export async function downloadMP3(url:string) {
         // Create a buffer from the response data
         const buffer = Buffer.from(response.data);
 
-        console.log('MP3 file downloaded successfully!');
+        console.log(`${url} file downloaded successfully!`);
         return buffer; // Return the buffer containing the MP3 data
     } catch (error:any) {
         console.error('Error downloading MP3:', error?.message);
     }
+}
+
+export async function buffer2File(buffer:Buffer, filePath:string){
+    return fs.writeFile(filePath, buffer, ()=>{
+        console.log(`${filePath} file saved successfully`)
+    })
+}
+
+export async function downloadFile(url:string, filePath:string){
+    let buffer = await downloadFileGetBuffer(url);
+    if(!buffer){
+        throw new Error(`File not available at ${url}`)
+    }
+    return buffer2File(buffer, filePath);
 }
 
 
@@ -81,7 +96,7 @@ export async function read_files(path:string, ext = '.txt'): Promise<MyFile[]> {
     let allTODO: MyFile[] = [];
     for (const file of files) {
 
-        if (!file.endsWith('.txt')) {
+        if (!file.endsWith(ext)) {
             continue;
         }
 
@@ -91,7 +106,8 @@ export async function read_files(path:string, ext = '.txt'): Promise<MyFile[]> {
           .toString();
         allTODO.push({
             name: file,
-            content: text
+            content: text,
+            fullPath
         });
     }
 

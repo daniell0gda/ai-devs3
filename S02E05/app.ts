@@ -1,5 +1,5 @@
 import {parse} from 'node-html-parser';
-import {downloadMP3, fetchPageContent, getImageAsBase64} from '../base/common.ts';
+import {downloadFileGetBuffer, fetchPageContent, getImageAsBase64} from '../base/common.ts';
 import fs from 'fs';
 import {make_ai_response} from '../base/ai_reusables.ts';
 import {OpenAIService} from '../base/openAiServices.ts';
@@ -139,7 +139,7 @@ async function transcribeMp3s() {
 
       for (const mp3 of pageContent1.mp3) {
         let downloadUrl = `https://centrala.ag3nts.org/dane/${mp3}`
-        let buffer = await downloadMP3(downloadUrl);
+        let buffer = await downloadFileGetBuffer(downloadUrl);
         if (buffer) {
           const transcription = await openaiService.transcribeAudio(buffer);
 
